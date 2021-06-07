@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  app:
+    image: centos8_apache_php_fpm
+    build: ./app
+    ports:
+      - 80
+    working_dir: /var/www/html
+    volumes:
+      - ./app:/var/www/html
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    tmpfs:
+      - /run
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: testdb
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - test-mysql-data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: testdb
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports: 
+      - 80
+    environment: 
+      PMA_ARBITRARY: 1
+
+  reverse-proxy:
+    build: ./reverse-proxy
+    ports:
+      - 80:80
+
+volumes:
+  test-mysql-data:
+  
